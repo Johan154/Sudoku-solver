@@ -7,7 +7,9 @@ def check_items(in_sud):
         for sub_row in row:
             for i in sub_row:
                 if i > 0:
-                    print(i, in_sud.index(row))
+                    row_index = in_sud.index(row) + 1
+                    column_index = ((row.index(sub_row)) * 3) + 1 + sub_row.index(i)
+                    print(i, row_index, column_index)
     return 0
 
 
