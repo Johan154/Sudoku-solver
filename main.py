@@ -1,9 +1,8 @@
 import math
-import sys
+import copy
 
 
 def check_cross(input_sudoku, row_idx, column_idx):
-    # print(row_idx, column_idx)
     # TODO: automatically generate this array
     option_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     for sub_row in input_sudoku[row_idx - 1]:
@@ -30,22 +29,32 @@ def check_square(input_sudoku, row_idx, column_idx):
     return option_list
 
 
-def check_items(in_sud, in_opt):
-    for row in in_sud:
+def check_options(input_sudoku, input_options):
+    for row in input_options:
+        for subrow in row:
+            for item in subrow:
+                if len(item) == 1:
+                    row_idx = input_options.index(row)
+                    subrow_idx = row.index(subrow)
+                    item_idx = subrow.index(item)
+                    input_sudoku[row_idx][subrow_idx][item_idx] = item[0]
+    return input_sudoku
+
+
+def check_items(input_sudoku, input_options):
+    for row in input_sudoku:
         for sub_row in row:
             count = 0
             for i in sub_row:
                 if i == 0:
-                    row_index = in_sud.index(row) + 1
+                    row_index = input_sudoku.index(row) + 1
                     column_index = ((row.index(sub_row)) * 3) + 1 + count
-                    item_options_iter1 = check_cross(in_sud, row_index, column_index)
-                    item_options_iter2 = check_square(in_sud, row_index, column_index)
-                    in_opt[in_sud.index(row)][row.index(sub_row)][count] = list(set(item_options_iter1) & set(item_options_iter2))
-                    # sys.exit()
+                    item_options_iter1 = check_cross(input_sudoku, row_index, column_index)
+                    item_options_iter2 = check_square(input_sudoku, row_index, column_index)
+                    input_options[input_sudoku.index(row)][row.index(sub_row)][count] = list(set(item_options_iter1) & set(item_options_iter2))
                 count += 1
-    # for rowx in in_opt:
-    #     print(rowx)
-    return 0
+    out_sudoku = check_options(input_sudoku, input_options)
+    return out_sudoku, input_options
 
 
 if __name__ == '__main__':
@@ -72,4 +81,15 @@ if __name__ == '__main__':
         [[[], [], []], [[], [], []], [[], [], []]],
         [[[], [], []], [[], [], []], [[], [], []]],
     ]
-    check_items(start, options)
+
+    start_sud = copy.deepcopy(start)
+    in_sud = start
+    in_opt = []
+    out_sud, out_opt = check_items(in_sud, options)
+
+    while out_sud != start_sud:
+        start_sud = copy.deepcopy(out_sud)
+        out_sud, out_opt = check_items(out_sud, out_opt)
+
+    for x in out_sud:
+        print(x)
