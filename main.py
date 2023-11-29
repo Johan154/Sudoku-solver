@@ -61,9 +61,23 @@ def check_options(input_sudoku, input_options):
                     subrow_idx = row.index(subrow)
                     item_idx = subrow.index(item)
                     input_sudoku[row_idx][subrow_idx][item_idx] = item[0]
-        occ = analyse_row_options(row)
-        if occ:
-            input_sudoku[row_idx][occ[1][0]][occ[1][1]] = occ[0]
+        sng_occ_row = analyse_row_options(row)
+        if sng_occ_row:
+            input_sudoku[row_idx][sng_occ_row[1][0]][sng_occ_row[1][1]] = sng_occ_row[0]
+
+    transposed_lists = list(map(list, zip(*input_options)))
+    count = 0
+    for i, transposed_list in enumerate(transposed_lists):
+        count += 1
+        transposed_lists = list(map(list, zip(*transposed_list)))
+        for i, transposed_list in enumerate(transposed_lists):
+            original_list = (transposed_lists[i])
+            grouped_list = [original_list[i:i + 3] for i in range(0, len(original_list), 3)]
+            sng_occ_col = analyse_row_options(grouped_list)
+            if sng_occ_col:
+                print(count, sng_occ_col, grouped_list)
+                # TODO: count which row should change
+                # input_sudoku[row_idx][sng_occ_col[1][0]][sng_occ_col[1][1]] = sng_occ_col[0]
     return input_sudoku
 
 
@@ -109,5 +123,3 @@ if __name__ == '__main__':
 
     for y in out_opt:
         print(y)
-    # for x in out_sud:
-    #     print(x)
