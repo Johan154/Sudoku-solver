@@ -3,8 +3,7 @@ import copy
 
 
 def check_cross(input_sudoku, row_idx, column_idx):
-    # TODO: automatically generate this array
-    option_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    option_list = [i for i in range(1, 10)]
     for sub_row in input_sudoku[row_idx - 1]:
         for i in sub_row:
             if i > 0:
