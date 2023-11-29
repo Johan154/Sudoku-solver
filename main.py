@@ -1,6 +1,8 @@
 import math
 import copy
 
+from collections import Counter
+
 
 def check_cross(input_sudoku, row_idx, column_idx):
     option_list = [i for i in range(1, 10)]
@@ -28,15 +30,40 @@ def check_square(input_sudoku, row_idx, column_idx):
     return option_list
 
 
+def analyse_row_options(row_opt_list):
+    flat_list = [item for sublist in row_opt_list for subsublist in sublist for item in subsublist]
+    element_counts = Counter(flat_list)
+    element_indices = {element: [] for element in element_counts}
+    for i, sublist in enumerate(row_opt_list):
+        for j, subsublist in enumerate(sublist):
+            for k, item in enumerate(subsublist):
+                if item in element_indices:
+                    element_indices[item].append((i, j, k))
+    unique_element = None
+    unique_element_index = None
+    for element, indices in element_indices.items():
+        if element_counts[element] == 1:
+            unique_element = element
+            unique_element_index = indices[0]
+            break
+    if unique_element is not None:
+        return [unique_element, unique_element_index]
+    else:
+        return []
+
+
 def check_options(input_sudoku, input_options):
     for row in input_options:
+        row_idx = input_options.index(row)
         for subrow in row:
             for item in subrow:
                 if len(item) == 1:
-                    row_idx = input_options.index(row)
                     subrow_idx = row.index(subrow)
                     item_idx = subrow.index(item)
                     input_sudoku[row_idx][subrow_idx][item_idx] = item[0]
+        occ = analyse_row_options(row)
+        if occ:
+            input_sudoku[row_idx][occ[1][0]][occ[1][1]] = occ[0]
     return input_sudoku
 
 
@@ -59,15 +86,15 @@ def check_items(input_sudoku, input_options):
 if __name__ == '__main__':
     # TODO: read directly from input file
     start = \
-        [[[5, 3, 0], [0, 7, 0], [0, 0, 0]],
-         [[6, 0, 0], [1, 9, 5], [0, 0, 0]],
-         [[0, 9, 8], [0, 0, 0], [0, 6, 0]],
-         [[8, 0, 0], [0, 6, 0], [0, 0, 3]],
-         [[4, 0, 0], [8, 0, 3], [0, 0, 1]],
-         [[7, 0, 0], [0, 2, 0], [0, 0, 6]],
-         [[0, 6, 0], [0, 0, 0], [2, 8, 0]],
-         [[0, 0, 0], [4, 1, 9], [0, 0, 5]],
-         [[0, 0, 0], [0, 8, 0], [0, 7, 9]]]
+        [[[0, 6, 0], [0, 0, 0], [0, 9, 1]],
+         [[0, 2, 8], [7, 0, 0], [0, 0, 3]],
+         [[1, 0, 0], [4, 0, 0], [8, 0, 0]],
+         [[0, 0, 0], [5, 0, 0], [0, 0, 2]],
+         [[5, 0, 0], [2, 0, 0], [0, 0, 4]],
+         [[0, 3, 0], [0, 0, 6], [0, 0, 7]],
+         [[0, 7, 0], [0, 0, 0], [0, 0, 0]],
+         [[0, 1, 0], [0, 8, 0], [6, 0, 0]],
+         [[3, 0, 4], [0, 2, 0], [0, 0, 0]]]
 
     options = [[[[] for k in range(3)] for j in range(3)] for i in range(9)]
 
@@ -80,5 +107,7 @@ if __name__ == '__main__':
         start_sud = copy.deepcopy(out_sud)
         out_sud, out_opt = check_items(out_sud, out_opt)
 
-    for x in out_sud:
-        print(x)
+    for y in out_opt:
+        print(y)
+    # for x in out_sud:
+    #     print(x)
