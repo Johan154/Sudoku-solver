@@ -29,6 +29,30 @@ def plot_sudoku(sudoku):
     plt.show()
 
 
+def plot_sudoku_options(options_grid):
+    rows = len(options_grid)
+    cols = len(options_grid[0])
+    options_matrix = np.zeros((rows, cols))
+    for i in range(rows):
+        for j in range(cols):
+            opts = options_grid[i][j]
+            opts.sort()
+            options_matrix[i, j] = len(opts)
+    plt.imshow(options_matrix, cmap='viridis', interpolation='nearest')
+    for i in range(rows):
+        for j in range(cols):
+            opts = options_grid[i][j]
+            if opts:
+                plt.text(j, i, ' '.join(map(str, opts)), color='white', ha='center', va='center', fontsize=7)
+    plt.xticks(range(cols))
+    plt.yticks(range(rows))
+    plt.xlabel('Column')
+    plt.ylabel('Row')
+    plt.title('Sudoku Options')
+    plt.colorbar(label='Number of Options')
+    plt.show()
+
+
 def check_straight(input_list):
     option_list = [i for i in range(1, 10)]
     for j in input_list:
@@ -65,6 +89,14 @@ def analyse_straight_options(input_list):
     # print("\n")
 
 
+def analyse_square_options(input_options):
+    # TODO:
+    # loop over squares
+    # check for each squares how many times an element can be used
+    # check for elements that are only possible 2 or 3 times if the are on the same row or column
+    return 0
+
+
 def find_element_index(list_of_lists, target_element):
     for i, sublist in enumerate(list_of_lists):
         if target_element in sublist:
@@ -74,11 +106,15 @@ def find_element_index(list_of_lists, target_element):
 
 def check_options(input_sudoku, input_options):
     print("\nIteration: ", iteration)
+    # TODO: make function that checks if one number can only be used in one cell within a square
+    # TODO: loop over squares for options list
+
     transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
         analyse_straight_options(row)
         analyse_straight_options(transposed_input_options[row_idx])
+        # TODO: make function that checks if one number is only possible in one direction, e.g. 6 only possible in col 8
         col_idx = 0
         for opt in row:
             if len(opt) == 1:
@@ -111,28 +147,6 @@ def check_items(input_sudoku, input_options):
     return out_sudoku, input_options
 
 
-def plot_sudoku_options(options_grid):
-    rows = len(options_grid)
-    cols = len(options_grid[0])
-    options_matrix = np.zeros((rows, cols))
-    for i in range(rows):
-        for j in range(cols):
-            opts = options_grid[i][j]
-            opts.sort()
-            options_matrix[i, j] = len(opts)
-    plt.imshow(options_matrix, cmap='viridis', interpolation='nearest')
-    for i in range(rows):
-        for j in range(cols):
-            opts = options_grid[i][j]
-            if opts:
-                plt.text(j, i, ' '.join(map(str, opts)), color='white', ha='center', va='center', fontsize=7)
-    plt.xticks(range(cols))
-    plt.yticks(range(rows))
-    plt.xlabel('Column')
-    plt.ylabel('Row')
-    plt.title('Sudoku Options')
-    plt.colorbar(label='Number of Options')
-    plt.show()
 
 
 if __name__ == '__main__':
