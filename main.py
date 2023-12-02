@@ -3,12 +3,30 @@ import copy
 import sys
 
 from collections import Counter
+from matplotlib import pyplot as plt
+from numpy.linalg import inv
+
+
+def plot_sudoku(grid):
+    fig, ax = plt.subplots()
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_xticks([2, 5], minor=True)
+    ax.set_yticks([2, 5], minor=True)
+    ax.grid(which="minor", color="black", linestyle='-', linewidth=2)
+    for i in range(9):
+        for j in range(9):
+            value = grid[i][j]
+            if value != 0:
+                ax.text(j + 0.5, i + 0.5, str(value),
+                        ha='center', va='center', fontsize=12)
+    plt.show()
 
 
 def check_straight(input_list):
     option_list = [i for i in range(1, 10)]
     for j in input_list:
-        if j > 0:
+        if j > 0 and j in option_list:
             option_list.remove(j)
     return option_list
 
@@ -48,31 +66,14 @@ def analyse_row_options(row_opt_list):
 
 
 def check_options(input_sudoku, input_options):
+    row_idx = 0
     for row in input_options:
-        row_idx = input_options.index(row)
-        for subrow in row:
-            for item in subrow:
-                if len(item) == 1:
-                    subrow_idx = row.index(subrow)
-                    item_idx = subrow.index(item)
-                    input_sudoku[row_idx][subrow_idx][item_idx] = item[0]
-        sng_occ_row = analyse_row_options(row)
-        if sng_occ_row:
-            input_sudoku[row_idx][sng_occ_row[1][0]][sng_occ_row[1][1]] = sng_occ_row[0]
-
-    transposed_lists = list(map(list, zip(*input_options)))
-    count = 0
-    for i, transposed_list in enumerate(transposed_lists):
-        count += 1
-        transposed_lists = list(map(list, zip(*transposed_list)))
-        for i, transposed_list in enumerate(transposed_lists):
-            original_list = (transposed_lists[i])
-            grouped_list = [original_list[i:i + 3] for i in range(0, len(original_list), 3)]
-            sng_occ_col = analyse_row_options(grouped_list)
-            if sng_occ_col:
-                print(count, sng_occ_col, grouped_list)
-                # TODO: count which row should change
-                # input_sudoku[row_idx][sng_occ_col[1][0]][sng_occ_col[1][1]] = sng_occ_col[0]
+        col_idx = 0
+        for options in row:
+            if len(options) == 1:
+                input_sudoku[row_idx][col_idx] = options[0]
+            col_idx += 1
+        row_idx += 1
     return input_sudoku
 
 
@@ -94,13 +95,12 @@ def check_items(input_sudoku, input_options):
 
                 # Update the options list
                 input_options[row_idx][col_idx] = intersection_list
-                for r in input_options:
-                    print(r)
-                sys.exit()
-            col_idx += 1
 
-    # out_sudoku = check_options(input_sudoku, input_options)
-    # return out_sudoku, input_options
+            col_idx += 1
+    # for r in input_options:
+    #     print(r)
+    out_sudoku = check_options(input_sudoku, input_options)
+    return out_sudoku, input_options
 
 
 if __name__ == '__main__':
@@ -119,18 +119,16 @@ if __name__ == '__main__':
 
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
-    # for row in options:
-    #     print(row)
 
-    # start_sud = copy.deepcopy(start)
-    # in_sud = start
-    # in_opt = []
-    # out_sud, out_opt = check_items(in_sud, options)
+    start_sud = copy.deepcopy(start)
+    in_sud = start
+    in_opt = options
+    out_sud, out_opt = check_items(in_sud, in_opt)
+    # print(out_sud)
+    while out_sud != start_sud:
+        start_sud = copy.deepcopy(out_sud)
+        out_sud, out_opt = check_items(out_sud, out_opt)
+        plot_sudoku(out_sud)
 
-    check_items(start, options)
-    # while out_sud != start_sud:
-    #     start_sud = copy.deepcopy(out_sud)
-    #     out_sud, out_opt = check_items(out_sud, out_opt)
-
-    # for y in out_opt:
-    #     print(y)
+    for y in out_sud:
+        print(y)
