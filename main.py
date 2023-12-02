@@ -1,6 +1,5 @@
 import math
 import copy
-import sys
 import numpy as np
 
 from collections import Counter
@@ -29,7 +28,6 @@ def plot_sudoku(sudoku):
             if value != 0:
                 ax.text(j + 0.5, 8.5 - i, str(value),
                         ha='center', va='center', fontsize=12)
-
     plt.show()
 
 
@@ -46,8 +44,7 @@ def check_square(input_sudoku, row_idx, col_idx):
     square_row_idx = math.floor(row_idx / 3)
     square_col_idx = math.floor(col_idx / 3)
     for i in range(square_row_idx * 3, (square_row_idx * 3) + 3):
-        # print(i, input_sudoku[i][(square_col_idx * 3):(square_col_idx * 3) + 3])
-        for j in input_sudoku[i][square_col_idx:square_col_idx + 3]:
+        for j in input_sudoku[i][(square_col_idx * 3):(square_col_idx * 3) + 3]:
             if j > 0 and j in option_list:
                 option_list.remove(j)
     return option_list
@@ -79,9 +76,9 @@ def check_options(input_sudoku, input_options):
     row_idx = 0
     for row in input_options:
         col_idx = 0
-        for options in row:
-            if len(options) == 1:
-                input_sudoku[row_idx][col_idx] = options[0]
+        for opt in row:
+            if len(opt) == 1:
+                input_sudoku[row_idx][col_idx] = opt[0]
             col_idx += 1
         row_idx += 1
     return input_sudoku
@@ -105,10 +102,7 @@ def check_items(input_sudoku, input_options):
 
                 # Update the options list
                 input_options[row_idx][col_idx] = intersection_list
-
             col_idx += 1
-    # for r in input_options:
-    #     print(r)
     out_sudoku = check_options(input_sudoku, input_options)
     return out_sudoku, input_options
 
@@ -134,12 +128,8 @@ if __name__ == '__main__':
     in_sud = start
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
-    plot_sudoku(out_sud)
 
     while out_sud != start_sud:
         start_sud = copy.deepcopy(out_sud)
         out_sud, out_opt = check_items(out_sud, out_opt)
-        plot_sudoku(out_sud)
-
-    # for y in out_sud:
-    #     print(y)
+    plot_sudoku(out_sud)
