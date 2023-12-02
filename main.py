@@ -1,25 +1,35 @@
 import math
 import copy
 import sys
+import numpy as np
 
 from collections import Counter
 from matplotlib import pyplot as plt
-from numpy.linalg import inv
 
 
-def plot_sudoku(grid):
-    fig, ax = plt.subplots()
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_xticks([2, 5], minor=True)
-    ax.set_yticks([2, 5], minor=True)
-    ax.grid(which="minor", color="black", linestyle='-', linewidth=2)
+def plot_sudoku(sudoku):
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_xticks(np.arange(0, 10, 1))
+    ax.set_yticks(np.arange(0, 10, 1))
+    ax.grid(which='both')
+
+    # Hide the major and minor ticks
+    ax.tick_params(which='both', size=0)
+    plt.setp(ax.get_xticklabels(), visible=False)
+    plt.setp(ax.get_yticklabels(), visible=False)
+
+    for i in range(1, 9):
+        linewidth = 2 if i % 3 == 0 else 0.5
+        ax.axhline(i, color='black', linewidth=linewidth)
+        ax.axvline(i, color='black', linewidth=linewidth)
+
     for i in range(9):
         for j in range(9):
-            value = grid[i][j]
+            value = sudoku[i][j]
             if value != 0:
-                ax.text(j + 0.5, i + 0.5, str(value),
+                ax.text(j + 0.5, 8.5 - i, str(value),
                         ha='center', va='center', fontsize=12)
+
     plt.show()
 
 
@@ -124,11 +134,12 @@ if __name__ == '__main__':
     in_sud = start
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
-    # print(out_sud)
+    plot_sudoku(out_sud)
+
     while out_sud != start_sud:
         start_sud = copy.deepcopy(out_sud)
         out_sud, out_opt = check_items(out_sud, out_opt)
         plot_sudoku(out_sud)
 
-    for y in out_sud:
-        print(y)
+    # for y in out_sud:
+    #     print(y)
