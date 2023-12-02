@@ -7,7 +7,7 @@ from collections import Counter
 
 def check_straight(input_list):
     option_list = [i for i in range(1, 10)]
-    for j in option_list:
+    for j in input_list:
         if j > 0:
             option_list.remove(j)
     return option_list
@@ -19,7 +19,7 @@ def check_square(input_sudoku, row_idx, col_idx):
     square_col_idx = math.floor(col_idx / 3)
     for i in range(square_row_idx * 3, (square_row_idx * 3) + 3):
         # print(i, input_sudoku[i][(square_col_idx * 3):(square_col_idx * 3) + 3])
-        for j in input_sudoku[i][square_row_idx:square_row_idx + 3]:
+        for j in input_sudoku[i][square_col_idx:square_col_idx + 3]:
             if j > 0 and j in option_list:
                 option_list.remove(j)
     return option_list
@@ -82,13 +82,21 @@ def check_items(input_sudoku, input_options):
         col_idx = 0
         for item in row:
             if item == 0:
-                row_options = check_straight(row)
+                # Check row, column and square for each 0 value
+                row_options = set(check_straight(row))
                 col = [line[col_idx] for line in input_sudoku]
-                col_options = check_straight(col)
-                square_options = check_square(input_sudoku, row_idx, col_idx)
+                col_options = set(check_straight(col))
+                square_options = set(check_square(input_sudoku, row_idx, col_idx))
 
-                # TODO: get union of the 3 lists
-                # sys.exit()
+                # Get the intersection of these 3 lists
+                intersection_result = row_options.intersection(col_options, square_options)
+                intersection_list = list(intersection_result)
+
+                # Update the options list
+                input_options[row_idx][col_idx] = intersection_list
+                for r in input_options:
+                    print(r)
+                sys.exit()
             col_idx += 1
 
     # out_sudoku = check_options(input_sudoku, input_options)
