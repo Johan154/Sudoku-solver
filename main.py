@@ -2,8 +2,8 @@ import math
 import copy
 import numpy as np
 
-from collections import Counter
 from matplotlib import pyplot as plt
+from collections import Counter
 
 
 def plot_sudoku(sudoku):
@@ -11,8 +11,6 @@ def plot_sudoku(sudoku):
     ax.set_xticks(np.arange(0, 10, 1))
     ax.set_yticks(np.arange(0, 10, 1))
     ax.grid(which='both')
-
-    # Hide the major and minor ticks
     ax.tick_params(which='both', size=0)
     plt.setp(ax.get_xticklabels(), visible=False)
     plt.setp(ax.get_yticklabels(), visible=False)
@@ -50,31 +48,37 @@ def check_square(input_sudoku, row_idx, col_idx):
     return option_list
 
 
-def analyse_row_options(row_opt_list):
-    flat_list = [item for sublist in row_opt_list for subsublist in sublist for item in subsublist]
-    element_counts = Counter(flat_list)
-    element_indices = {element: [] for element in element_counts}
-    for i, sublist in enumerate(row_opt_list):
-        for j, subsublist in enumerate(sublist):
-            for k, item in enumerate(subsublist):
-                if item in element_indices:
-                    element_indices[item].append((i, j, k))
-    unique_element = None
-    unique_element_index = None
-    for element, indices in element_indices.items():
-        if element_counts[element] == 1:
-            unique_element = element
-            unique_element_index = indices[0]
-            break
-    if unique_element is not None:
-        return [unique_element, unique_element_index]
-    else:
-        return []
+def analyse_straight_options(input_list):
+    sng_options = []
+    all_options = [item for sublist in input_list for item in sublist]
+    for item_opt in input_list:
+        for opt in item_opt:
+            all_options.append(opt)
+    count_all_options = Counter(all_options)
+    for i in count_all_options:
+        count = count_all_options[i]
+        if count == 1:
+            # TODO: use this information to update the current sudoku
+            print(iteration, find_element_index(input_list, i))
+            sng_options.append(i)
+        # print(i, count_all_options[i])
+    # print("\n")
+
+
+def find_element_index(list_of_lists, target_element):
+    for i, sublist in enumerate(list_of_lists):
+        if target_element in sublist:
+            return i, sublist.index(target_element)
+    return None
 
 
 def check_options(input_sudoku, input_options):
+    print("\nIteration: ", iteration)
+    transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
+        analyse_straight_options(row)
+        analyse_straight_options(transposed_input_options[row_idx])
         col_idx = 0
         for opt in row:
             if len(opt) == 1:
@@ -107,29 +111,56 @@ def check_items(input_sudoku, input_options):
     return out_sudoku, input_options
 
 
+def plot_sudoku_options(options_grid):
+    rows = len(options_grid)
+    cols = len(options_grid[0])
+    options_matrix = np.zeros((rows, cols))
+    for i in range(rows):
+        for j in range(cols):
+            opts = options_grid[i][j]
+            opts.sort()
+            options_matrix[i, j] = len(opts)
+    plt.imshow(options_matrix, cmap='viridis', interpolation='nearest')
+    for i in range(rows):
+        for j in range(cols):
+            opts = options_grid[i][j]
+            if opts:
+                plt.text(j, i, ' '.join(map(str, opts)), color='white', ha='center', va='center', fontsize=7)
+    plt.xticks(range(cols))
+    plt.yticks(range(rows))
+    plt.xlabel('Column')
+    plt.ylabel('Row')
+    plt.title('Sudoku Options')
+    plt.colorbar(label='Number of Options')
+    plt.show()
+
+
 if __name__ == '__main__':
     # TODO: read directly from input file
     # Create initial sudoku
     start = \
-        [[5, 3, 0, 0, 7, 0, 0, 0, 0],
-         [6, 0, 0, 1, 9, 5, 0, 0, 0],
-         [0, 9, 8, 0, 0, 0, 0, 6, 0],
-         [8, 0, 0, 0, 6, 0, 0, 0, 3],
-         [4, 0, 0, 8, 0, 3, 0, 0, 1],
-         [7, 0, 0, 0, 2, 0, 0, 0, 6],
-         [0, 6, 0, 0, 0, 0, 2, 8, 0],
-         [0, 0, 0, 4, 1, 9, 0, 0, 5],
-         [0, 0, 0, 0, 8, 0, 0, 7, 9]]
+        [[0, 6, 0, 0, 0, 0, 0, 9, 1],
+         [0, 2, 8, 7, 0, 0, 0, 0, 3],
+         [1, 0, 0, 4, 0, 0, 8, 0, 0],
+         [0, 0, 0, 5, 0, 0, 0, 0, 2],
+         [5, 0, 0, 2, 0, 0, 0, 0, 4],
+         [0, 3, 0, 0, 0, 6, 0, 0, 7],
+         [0, 7, 0, 0, 0, 0, 0, 0, 0],
+         [0, 1, 0, 0, 8, 0, 6, 0, 0],
+         [3, 0, 4, 0, 2, 0, 0, 0, 0]]
 
+    # plot_sudoku(start)
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
-
+    iteration = 1
     start_sud = copy.deepcopy(start)
     in_sud = start
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
 
+    plot_sudoku_options(out_opt)
     while out_sud != start_sud:
+        iteration += 1
         start_sud = copy.deepcopy(out_sud)
         out_sud, out_opt = check_items(out_sud, out_opt)
-    plot_sudoku(out_sud)
+    # plot_sudoku(out_sud)
