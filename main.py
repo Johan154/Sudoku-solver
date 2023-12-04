@@ -90,14 +90,31 @@ def analyse_straight_options(input_list):
 
 
 def check_square_options(input_list):
+    options_list = []
+    for subrow in input_list:
+        for cell in subrow:
+            for option in cell:
+                options_list.append(option)
+    options_count = Counter(options_list)
+    for i in options_count:
+        count = options_count[i]
+        if count == 1:
+            # TODO: use this information to update the current sudoku
+            print(i, count)
+        if 2 <= count <= 3:
+            # TODO: use this information to update the current options
+            print("test", i, count)
+
     return 0
+
 
 def analyse_square_options(input_options):
     plot_sudoku_options(input_options)
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
-            print(square)
+            check_square_options(square)
+            # print(square)
 
 
     # TODO:
