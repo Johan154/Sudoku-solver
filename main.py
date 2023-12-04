@@ -89,7 +89,17 @@ def analyse_straight_options(input_list):
     # print("\n")
 
 
+def check_square_options(input_list):
+    return 0
+
 def analyse_square_options(input_options):
+    plot_sudoku_options(input_options)
+    for i in range(0, 9, 3):
+        for j in range(0, 9, 3):
+            square = [row[j:j + 3] for row in input_options[i:i + 3]]
+            print(square)
+
+
     # TODO:
     # loop over squares
     # check for each squares how many times an element can be used
@@ -108,7 +118,7 @@ def check_options(input_sudoku, input_options):
     print("\nIteration: ", iteration)
     # TODO: make function that checks if one number can only be used in one cell within a square
     # TODO: loop over squares for options list
-
+    analyse_square_options(input_options)
     transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
@@ -147,8 +157,6 @@ def check_items(input_sudoku, input_options):
     return out_sudoku, input_options
 
 
-
-
 if __name__ == '__main__':
     # TODO: read directly from input file
     # Create initial sudoku
@@ -172,7 +180,7 @@ if __name__ == '__main__':
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
 
-    plot_sudoku_options(out_opt)
+    # plot_sudoku_options(out_opt)
     while out_sud != start_sud:
         iteration += 1
         start_sud = copy.deepcopy(out_sud)
