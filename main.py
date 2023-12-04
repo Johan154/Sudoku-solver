@@ -90,6 +90,7 @@ def analyse_straight_options(input_list):
 
 
 def check_square_options(input_list):
+    opt_per_cell = [cell_opts for row in input_list for cell_opts in row]
     options_list = []
     for subrow in input_list:
         for cell in subrow:
@@ -102,9 +103,17 @@ def check_square_options(input_list):
             # TODO: use this information to update the current sudoku
             print(i, count)
         if 2 <= count <= 3:
+            row_coords, col_coords = [], []
+            for row_index, inner_list in enumerate(opt_per_cell):
+                for col_index, element in enumerate(inner_list):
+                    if element == i:
+                        row_coords.append(row_index % 3)
+                        col_coords.append(math.floor(row_index / 3))
             # TODO: use this information to update the current options
-            print("test", i, count)
-
+            if all(element == row_coords[0] for element in row_coords):
+                print(f"{i} all in the same column")
+            if all(element == col_coords[0] for element in col_coords):
+                print(f"{i} all in the same row")
     return 0
 
 
@@ -112,15 +121,9 @@ def analyse_square_options(input_options):
     plot_sudoku_options(input_options)
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
+            print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
             check_square_options(square)
-            # print(square)
-
-
-    # TODO:
-    # loop over squares
-    # check for each squares how many times an element can be used
-    # check for elements that are only possible 2 or 3 times if the are on the same row or column
     return 0
 
 
@@ -133,15 +136,12 @@ def find_element_index(list_of_lists, target_element):
 
 def check_options(input_sudoku, input_options):
     print("\nIteration: ", iteration)
-    # TODO: make function that checks if one number can only be used in one cell within a square
-    # TODO: loop over squares for options list
     analyse_square_options(input_options)
     transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
         analyse_straight_options(row)
         analyse_straight_options(transposed_input_options[row_idx])
-        # TODO: make function that checks if one number is only possible in one direction, e.g. 6 only possible in col 8
         col_idx = 0
         for opt in row:
             if len(opt) == 1:
@@ -197,9 +197,7 @@ if __name__ == '__main__':
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
 
-    # plot_sudoku_options(out_opt)
     while out_sud != start_sud:
         iteration += 1
         start_sud = copy.deepcopy(out_sud)
         out_sud, out_opt = check_items(out_sud, out_opt)
-    # plot_sudoku(out_sud)
