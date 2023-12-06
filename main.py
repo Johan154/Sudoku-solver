@@ -92,7 +92,7 @@ def analyse_straight_options(input_list):
 
 def prune_options(ele, prune_row, input_options, sq_idx):
     row_to_prune = input_options[prune_row]
-    print(row_to_prune)
+    # print(row_to_prune)
     cell_count = 0
     skip_cells = [0, 1, 2]
     if sq_idx > 0:
@@ -101,7 +101,7 @@ def prune_options(ele, prune_row, input_options, sq_idx):
         if ele in cell and cell_count not in skip_cells:
             cell.remove(ele)
         cell_count += 1
-    print(row_to_prune)
+    # print(row_to_prune)
     return 0
 
 
@@ -126,10 +126,11 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
                         row_coords.append(row_index % 3)
                         col_coords.append(math.floor(row_index / 3))
             # TODO: use this information to update the current options
-            # if all(element == row_coords[0] for element in row_coords):
-            #     row_idx = sq_col_idx + row_coords[0]
-            #     print(f"{i} all in the same column ({row_idx})")
-            #     print(row_coords)
+            if all(element == row_coords[0] for element in row_coords):
+                row_idx = sq_col_idx + row_coords[0]
+                transposed_inputs = [[row[i] for row in input_options] for i in range(len(input_options[0]))]
+                print(f"{i} all in the same column ({row_idx})")
+                prune_options(i, row_idx, transposed_inputs, sq_idx[0])
             if all(element == col_coords[0] for element in col_coords):
                 row_idx = sq_row_idx + col_coords[0]
                 print(f"{i} all in the same row ({row_idx})")
@@ -144,7 +145,7 @@ def analyse_square_options(input_options):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
             check_square_options(square, i, j, input_options, [round(i/3), round(j/3)])
-        sys.exit()
+        # sys.exit()
     return 0
 
 
