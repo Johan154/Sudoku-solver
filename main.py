@@ -1,5 +1,6 @@
 import math
 import copy
+import sys
 import numpy as np
 
 from matplotlib import pyplot as plt
@@ -89,7 +90,22 @@ def analyse_straight_options(input_list):
     # print("\n")
 
 
-def check_square_options(input_list):
+def prune_options(ele, prune_row, input_options, sq_idx):
+    row_to_prune = input_options[prune_row]
+    print(row_to_prune)
+    cell_count = 0
+    skip_cells = [0, 1, 2]
+    if sq_idx > 0:
+        skip_cells = [i + (sq_idx * 3) for i in skip_cells]
+    for cell in row_to_prune:
+        if ele in cell and cell_count not in skip_cells:
+            cell.remove(ele)
+        cell_count += 1
+    print(row_to_prune)
+    return 0
+
+
+def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_idx):
     opt_per_cell = [cell_opts for row in input_list for cell_opts in row]
     options_list = []
     for subrow in input_list:
@@ -110,10 +126,14 @@ def check_square_options(input_list):
                         row_coords.append(row_index % 3)
                         col_coords.append(math.floor(row_index / 3))
             # TODO: use this information to update the current options
-            if all(element == row_coords[0] for element in row_coords):
-                print(f"{i} all in the same column")
+            # if all(element == row_coords[0] for element in row_coords):
+            #     row_idx = sq_col_idx + row_coords[0]
+            #     print(f"{i} all in the same column ({row_idx})")
+            #     print(row_coords)
             if all(element == col_coords[0] for element in col_coords):
-                print(f"{i} all in the same row")
+                row_idx = sq_row_idx + col_coords[0]
+                print(f"{i} all in the same row ({row_idx})")
+                prune_options(i, row_idx, input_options, sq_idx[1])
     return 0
 
 
@@ -123,7 +143,8 @@ def analyse_square_options(input_options):
         for j in range(0, 9, 3):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
-            check_square_options(square)
+            check_square_options(square, i, j, input_options, [round(i/3), round(j/3)])
+        sys.exit()
     return 0
 
 
@@ -188,7 +209,7 @@ if __name__ == '__main__':
          [0, 1, 0, 0, 8, 0, 6, 0, 0],
          [3, 0, 4, 0, 2, 0, 0, 0, 0]]
 
-    # plot_sudoku(start)
+    plot_sudoku(start)
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
     iteration = 1
