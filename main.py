@@ -92,7 +92,6 @@ def analyse_straight_options(input_list):
 
 def prune_options(ele, prune_row, input_options, sq_idx):
     row_to_prune = input_options[prune_row]
-    # print(row_to_prune)
     cell_count = 0
     skip_cells = [0, 1, 2]
     if sq_idx > 0:
@@ -101,7 +100,6 @@ def prune_options(ele, prune_row, input_options, sq_idx):
         if ele in cell and cell_count not in skip_cells:
             cell.remove(ele)
         cell_count += 1
-    # print(row_to_prune)
     return 0
 
 
@@ -129,24 +127,26 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
             if all(element == row_coords[0] for element in row_coords):
                 row_idx = sq_col_idx + row_coords[0]
                 transposed_inputs = [[row[i] for row in input_options] for i in range(len(input_options[0]))]
-                print(f"{i} all in the same column ({row_idx})")
+                # print(f"{i} all in the same column ({row_idx})")
                 prune_options(i, row_idx, transposed_inputs, sq_idx[0])
+
+                # sys.exit()
             if all(element == col_coords[0] for element in col_coords):
                 row_idx = sq_row_idx + col_coords[0]
-                print(f"{i} all in the same row ({row_idx})")
+                # print(f"{i} all in the same row ({row_idx})")
                 prune_options(i, row_idx, input_options, sq_idx[1])
-    return 0
+    return input_options
 
 
 def analyse_square_options(input_options):
-    plot_sudoku_options(input_options)
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
-            check_square_options(square, i, j, input_options, [round(i/3), round(j/3)])
+            input_options = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)])
         # sys.exit()
-    return 0
+
+    return input_options
 
 
 def find_element_index(list_of_lists, target_element):
@@ -158,7 +158,7 @@ def find_element_index(list_of_lists, target_element):
 
 def check_options(input_sudoku, input_options):
     print("\nIteration: ", iteration)
-    analyse_square_options(input_options)
+    input_options = analyse_square_options(input_options)
     transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
@@ -170,7 +170,7 @@ def check_options(input_sudoku, input_options):
                 input_sudoku[row_idx][col_idx] = opt[0]
             col_idx += 1
         row_idx += 1
-    return input_sudoku
+    return input_sudoku, input_options
 
 
 def check_items(input_sudoku, input_options):
@@ -192,7 +192,7 @@ def check_items(input_sudoku, input_options):
                 # Update the options list
                 input_options[row_idx][col_idx] = intersection_list
             col_idx += 1
-    out_sudoku = check_options(input_sudoku, input_options)
+    out_sudoku, input_options = check_options(input_sudoku, input_options)
     return out_sudoku, input_options
 
 
@@ -210,16 +210,25 @@ if __name__ == '__main__':
          [0, 1, 0, 0, 8, 0, 6, 0, 0],
          [3, 0, 4, 0, 2, 0, 0, 0, 0]]
 
-    plot_sudoku(start)
+    # plot_sudoku(start)
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
     iteration = 1
     start_sud = copy.deepcopy(start)
     in_sud = start
     in_opt = options
+    plot_sudoku(in_sud)
     out_sud, out_opt = check_items(in_sud, in_opt)
+    plot_sudoku(out_sud)
+    # plot_sudoku_options(out_opt)
+    out_sud, out_opt = check_items(out_sud, out_opt)
+    plot_sudoku(out_sud)
 
-    while out_sud != start_sud:
-        iteration += 1
-        start_sud = copy.deepcopy(out_sud)
-        out_sud, out_opt = check_items(out_sud, out_opt)
+    # plot_sudoku_options(out_opt)
+
+
+    # while True:
+    #     iteration += 1
+    #     start_sud = copy.deepcopy(out_sud)
+    #     out_sud, out_opt = check_items(out_sud, out_opt)
+    #     plot_sudoku_options(out_opt)
