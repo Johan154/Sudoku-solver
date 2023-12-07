@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from collections import Counter
 
 
-def plot_sudoku(sudoku):
+def plot_sudoku(sudoku, title):
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_xticks(np.arange(0, 10, 1))
     ax.set_yticks(np.arange(0, 10, 1))
@@ -27,10 +27,11 @@ def plot_sudoku(sudoku):
             if value != 0:
                 ax.text(j + 0.5, 8.5 - i, str(value),
                         ha='center', va='center', fontsize=12)
+    plt.title(title)
     plt.show()
 
 
-def plot_sudoku_options(options_grid):
+def plot_sudoku_options(options_grid, title):
     rows = len(options_grid)
     cols = len(options_grid[0])
     options_matrix = np.zeros((rows, cols))
@@ -49,7 +50,7 @@ def plot_sudoku_options(options_grid):
     plt.yticks(range(rows))
     plt.xlabel('Column')
     plt.ylabel('Row')
-    plt.title('Sudoku Options')
+    plt.title(title)
     plt.colorbar(label='Number of Options')
     plt.show()
 
@@ -103,7 +104,7 @@ def prune_options(ele, prune_row, input_options, sq_idx):
     return 0
 
 
-def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_idx):
+def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_idx, input_sudoku):
     opt_per_cell = [cell_opts for row in input_list for cell_opts in row]
     options_list = []
     for subrow in input_list:
@@ -115,7 +116,11 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
         count = options_count[i]
         if count == 1:
             # TODO: use this information to update the current sudoku
-            print(i, count)
+            print(f"Element {i} is only possible in {count} cell")
+            loc_sq = find_element_index(input_list, i)
+            input_sudoku[(sq_idx[0] * 3) + loc_sq[0]][(sq_idx[1] * 3) + loc_sq[1]] = i
+            # plot_sudoku(input_sudoku, "target")
+
         if 2 <= count <= 3:
             row_coords, col_coords = [], []
             for row_index, inner_list in enumerate(opt_per_cell):
@@ -135,30 +140,35 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
                 row_idx = sq_row_idx + col_coords[0]
                 # print(f"{i} all in the same row ({row_idx})")
                 prune_options(i, row_idx, input_options, sq_idx[1])
-    return input_options
+    return input_options, input_sudoku
 
 
-def analyse_square_options(input_options):
+def analyse_square_options(input_options, input_sudoku):
+    plot_sudoku(input_sudoku, "start")
+    # plot_sudoku_options(input_options, "anaylyse square options")
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
-            input_options = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)])
+            input_options, input_sudoku = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)], input_sudoku)
         # sys.exit()
-
-    return input_options
+    plot_sudoku(input_sudoku, "end")
+    # plot_sudoku_options(input_options, "end")
+    return input_options, input_sudoku
 
 
 def find_element_index(list_of_lists, target_element):
     for i, sublist in enumerate(list_of_lists):
-        if target_element in sublist:
-            return i, sublist.index(target_element)
+        for j, cell in enumerate(sublist):
+            if target_element in cell:
+                print()
+                return list_of_lists.index(sublist), j
     return None
 
 
 def check_options(input_sudoku, input_options):
     print("\nIteration: ", iteration)
-    input_options = analyse_square_options(input_options)
+    input_options, input_sudoku = analyse_square_options(input_options, input_sudoku)
     transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
@@ -174,6 +184,8 @@ def check_options(input_sudoku, input_options):
 
 
 def check_items(input_sudoku, input_options):
+    # plot_sudoku(input_sudoku, "check items start")
+    # plot_sudoku_options(input_options, "check items start")
     for row in input_sudoku:
         row_idx = input_sudoku.index(row)
         col_idx = 0
@@ -193,6 +205,8 @@ def check_items(input_sudoku, input_options):
                 input_options[row_idx][col_idx] = intersection_list
             col_idx += 1
     out_sudoku, input_options = check_options(input_sudoku, input_options)
+    # plot_sudoku(out_sudoku, "check items finish")
+    # plot_sudoku_options(out_options, "check items finish")
     return out_sudoku, input_options
 
 
@@ -216,15 +230,9 @@ if __name__ == '__main__':
     start_sud = copy.deepcopy(start)
     in_sud = start
     in_opt = options
-    plot_sudoku(in_sud)
+    # plot_sudoku(in_sud)
     out_sud, out_opt = check_items(in_sud, in_opt)
-    plot_sudoku(out_sud)
-    # plot_sudoku_options(out_opt)
-    out_sud, out_opt = check_items(out_sud, out_opt)
-    plot_sudoku(out_sud)
-
-    # plot_sudoku_options(out_opt)
-
+    # out_sud2, out_opt2 = check_items(out_sud, out_opt)
 
     # while True:
     #     iteration += 1
