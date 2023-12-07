@@ -1,3 +1,4 @@
+import itertools
 import math
 import copy
 import sys
@@ -75,19 +76,19 @@ def check_square(input_sudoku, row_idx, col_idx):
     return option_list
 
 
-def analyse_straight_options(input_list):
-    sng_options = []
-    all_options = [item for sublist in input_list for item in sublist]
-    for item_opt in input_list:
-        for opt in item_opt:
-            all_options.append(opt)
-    count_all_options = Counter(all_options)
-    for i in count_all_options:
-        count = count_all_options[i]
-        if count == 1:
-            # TODO: use this information to update the current sudoku
-            print(iteration, find_element_index(input_list, i))
-            sng_options.append(i)
+# def analyse_straight_options(input_list):
+#     sng_options = []
+#     all_options = [item for sublist in input_list for item in sublist]
+#     for item_opt in input_list:
+#         for opt in item_opt:
+#             all_options.append(opt)
+#     count_all_options = Counter(all_options)
+#     for i in count_all_options:
+#         count = count_all_options[i]
+#         if count == 1:
+#             # TODO: use this information to update the current sudoku
+#             print(iteration, find_element_index(input_list, i))
+#             sng_options.append(i)
         # print(i, count_all_options[i])
     # print("\n")
 
@@ -113,7 +114,6 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
             for option in cell:
                 options_list.append(option)
     options_count = Counter(options_list)
-    print(f"iteration {iteration}", options_count)
     for i in options_count:
         count = options_count[i]
         if count == 1:
@@ -143,17 +143,24 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
     return input_options, input_sudoku
 
 
+def check_square_equals(input_list):
+    # TODO: make this working for all lengths
+    # TODO: use information to update input_options
+    cell_list = [element for innerList in input_list for element in innerList]
+    for a, b in itertools.combinations(cell_list, 2):
+        if a == b and a and b:
+            if len(a) == 2:
+                print("Matching inputs found", a, b)
+    return 0
+
+
 def analyse_square_options(input_options, input_sudoku):
-    # plot_sudoku(input_sudoku, "start")
-    plot_sudoku_options(input_options, f"analyse square options {iteration}")
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
             input_options, input_sudoku = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)], input_sudoku)
-        # sys.exit()
-    # plot_sudoku(input_sudoku, "end")
-    # plot_sudoku_options(input_options, "end")
+            check_square_equals(square)
     return input_options, input_sudoku
 
 
@@ -172,8 +179,8 @@ def check_options(input_sudoku, input_options):
     transposed_input_options = [list(line) for line in zip(*input_options)]
     row_idx = 0
     for row in input_options:
-        analyse_straight_options(row)
-        analyse_straight_options(transposed_input_options[row_idx])
+        # analyse_straight_options(row)
+        # analyse_straight_options(transposed_input_options[row_idx])
         col_idx = 0
         for opt in row:
             if len(opt) == 1:
@@ -185,7 +192,7 @@ def check_options(input_sudoku, input_options):
 
 def check_items(input_sudoku, input_options):
     # plot_sudoku(input_sudoku, "check items start")
-    plot_sudoku_options(input_options, f"check items {iteration} v1")
+    # plot_sudoku_options(input_options, f"check items {iteration} v1")
     if iteration == 1:
         for row in input_sudoku:
             row_idx = input_sudoku.index(row)
@@ -205,12 +212,7 @@ def check_items(input_sudoku, input_options):
                     # Update the options list
                     input_options[row_idx][col_idx] = intersection_list
                 col_idx += 1
-            plot_sudoku_options(input_options, f"check items {iteration} {row_idx}")
-    plot_sudoku_options(input_options, f"check items {iteration} v2")
     out_sudoku, input_options = check_options(input_sudoku, input_options)
-    plot_sudoku_options(input_options, f"check items {iteration} v3")
-    # plot_sudoku(out_sudoku, "check items finish")
-    # plot_sudoku_options(out_options, "check items finish")
     return out_sudoku, input_options
 
 
@@ -235,19 +237,17 @@ if __name__ == '__main__':
     in_sud = start
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
-    plot_sudoku(out_sud, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt, f"out opt {iteration}")
+    # plot_sudoku(out_sud, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt, f"out opt {iteration}")
 
     time.sleep(0.3)
     iteration = 2
     out_sud2, out_opt2 = check_items(out_sud, out_opt)
-    plot_sudoku(out_sud2, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt2, f"out opt {iteration}")
+    # plot_sudoku(out_sud2, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt2, f"out opt {iteration}")
 
-    # time.sleep(0.3)
-    # iteration = 3
-    # out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
+    time.sleep(0.3)
+    iteration = 3
+    out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
     # plot_sudoku(out_sud3, f"out_sud {iteration}")
     # plot_sudoku_options(out_opt3, f"out opt {iteration}")
-
-
