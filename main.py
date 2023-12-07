@@ -210,7 +210,6 @@ if __name__ == '__main__':
          [0, 1, 0, 0, 8, 0, 6, 0, 0],
          [3, 0, 4, 0, 2, 0, 0, 0, 0]]
 
-    # plot_sudoku(start)
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
     iteration = 1
