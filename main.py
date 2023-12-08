@@ -76,23 +76,6 @@ def check_square(input_sudoku, row_idx, col_idx):
     return option_list
 
 
-# def analyse_straight_options(input_list):
-#     sng_options = []
-#     all_options = [item for sublist in input_list for item in sublist]
-#     for item_opt in input_list:
-#         for opt in item_opt:
-#             all_options.append(opt)
-#     count_all_options = Counter(all_options)
-#     for i in count_all_options:
-#         count = count_all_options[i]
-#         if count == 1:
-#             # TODO: use this information to update the current sudoku
-#             print(iteration, find_element_index(input_list, i))
-#             sng_options.append(i)
-        # print(i, count_all_options[i])
-    # print("\n")
-
-
 def prune_options(ele, prune_row, input_options, sq_idx):
     row_to_prune = input_options[prune_row]
     cell_count = 0
@@ -145,13 +128,17 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
 
 def check_square_equals(input_list):
     # TODO: make this working for all lengths
-    # TODO: use information to update input_options
     cell_list = [element for innerList in input_list for element in innerList]
     for a, b in itertools.combinations(cell_list, 2):
         if a == b and a and b:
             if len(a) == 2:
                 print("Matching inputs found", a, b)
-    return 0
+                indices = [i for i, x in enumerate(cell_list) if x == a]
+                for j in range(len(cell_list)):
+                    if cell_list[j] and j not in indices:
+                        cell_list[j] = list(set(cell_list[j]).difference(a))
+    input_list = [cell_list[i:i+3] for i in range(0, len(cell_list), 3)]
+    return input_list
 
 
 def analyse_square_options(input_options, input_sudoku):
@@ -160,7 +147,13 @@ def analyse_square_options(input_options, input_sudoku):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
             input_options, input_sudoku = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)], input_sudoku)
-            check_square_equals(square)
+            new_square = check_square_equals(square)
+            if square != new_square:
+                start_row, start_col = i, j
+                for y in range(3):
+                    for z in range(3):
+                        input_options[start_row + y][start_col + z] = new_square[y][z]
+
     return input_options, input_sudoku
 
 
@@ -249,5 +242,11 @@ if __name__ == '__main__':
     time.sleep(0.3)
     iteration = 3
     out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
-    # plot_sudoku(out_sud3, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt3, f"out opt {iteration}")
+    plot_sudoku(out_sud3, f"out_sud {iteration}")
+    plot_sudoku_options(out_opt3, f"out opt {iteration}")
+
+    time.sleep(0.3)
+    iteration = 4
+    out_sud4, out_opt4 = check_items(out_sud3, out_opt3)
+    plot_sudoku(out_sud4, f"out_sud {iteration}")
+    plot_sudoku_options(out_opt4, f"out opt {iteration}")
