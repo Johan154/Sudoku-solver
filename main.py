@@ -1,8 +1,5 @@
 import itertools
 import math
-import copy
-import sys
-import time
 import numpy as np
 
 from matplotlib import pyplot as plt
@@ -103,7 +100,6 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
             loc_sq = find_element_index(input_list, i)
             row_id = (sq_idx[0] * 3) + loc_sq[0]
             col_id = (sq_idx[1] * 3) + loc_sq[1]
-            print(f"Element {i} is only possible in {count} cell in row {row_id} and column {col_id}")
             input_sudoku[row_id][col_id] = i
             input_options[row_id][col_id] = []
             prune_options_ele_added(input_options, row_id, col_id, i)
@@ -119,11 +115,9 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
             if all(element == row_coords[0] for element in row_coords):
                 row_idx = sq_col_idx + row_coords[0]
                 transposed_inputs = [[row[i] for row in input_options] for i in range(len(input_options[0]))]
-                # print(f"{i} all in the same column ({row_idx})")
                 prune_options_same_dir(i, row_idx, transposed_inputs, sq_idx[0])
             if all(element == col_coords[0] for element in col_coords):
                 row_idx = sq_row_idx + col_coords[0]
-                # print(f"{i} all in the same row ({row_idx})")
                 prune_options_same_dir(i, row_idx, input_options, sq_idx[1])
     return input_options, input_sudoku
 
@@ -135,7 +129,6 @@ def check_square_equals(input_list, sq_row_idx, sq_col_idx, input_options, sq_id
         if a == b and a and b:
             if len(a) == 2:
                 indices = [i for i, x in enumerate(cell_list) if x == a]
-                print(f"Matching inputs found {a} with indices {indices}")
                 for j in range(len(cell_list)):
                     if cell_list[j] and j not in indices:
                         cell_list[j] = list(set(cell_list[j]).difference(a))
@@ -149,12 +142,10 @@ def check_square_equals(input_list, sq_row_idx, sq_col_idx, input_options, sq_id
                     for i in a:
                         row_idx = sq_col_idx + row_coords[0]
                         transposed_inputs = [[row[p] for row in input_options] for p in range(len(input_options[0]))]
-                        # print(f"{i} all in the same column ({row_idx})")
                         prune_options_same_dir(i, row_idx, transposed_inputs, sq_idx[0])
                 if all(element == col_coords[0] for element in col_coords):
                     for i in a:
                         row_idx = sq_row_idx + col_coords[0]
-                        # print(f"{i} all in the same row ({row_idx})")
                         prune_options_same_dir(i, row_idx, input_options, sq_idx[1])
     input_list = [cell_list[i:i+3] for i in range(0, len(cell_list), 3)]
     return input_list
@@ -197,7 +188,6 @@ def prune_options_ele_added(input_options, row_idx, col_idx, ele):
 
 
 def check_options(input_sudoku, input_options):
-    # print("\nIteration: ", iteration)
     input_options, input_sudoku = analyse_square_options(input_options, input_sudoku)
     row_idx = 0
     for row in input_options:
@@ -206,12 +196,9 @@ def check_options(input_sudoku, input_options):
             if len(opt) == 1:
                 input_sudoku[row_idx][col_idx] = opt[0]
                 input_options[row_idx][col_idx] = []
-                # plot_sudoku(input_sudoku, f"inbetween version {iteration}")
                 print(f"Updated sudoku with element {opt[0]} in row {row_idx} and column {col_idx}")
                 prune_options_ele_added(input_options, row_idx, col_idx, opt[0])
-                # plot_sudoku_options(input_options, f"inbetween version {iteration}")
                 transposed_inputs = [[line[i] for line in input_options] for i in range(len(input_options[0]))]
-                # plot_sudoku_options(transposed_inputs, f"inbetween version {iteration}")
                 prune_options_ele_added(transposed_inputs, col_idx, row_idx, opt[0])
             col_idx += 1
         row_idx += 1
@@ -219,7 +206,6 @@ def check_options(input_sudoku, input_options):
 
 
 def check_items(input_sudoku, input_options):
-    # if iteration == 1:
     for row in input_sudoku:
         row_idx = input_sudoku.index(row)
         col_idx = 0
@@ -238,7 +224,6 @@ def check_items(input_sudoku, input_options):
                 # Update the options list
                 input_options[row_idx][col_idx] = intersection_list
             col_idx += 1
-    # out_sudoku, input_options = check_options(input_sudoku, input_options)
     return input_sudoku, input_options
 
 
