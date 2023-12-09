@@ -100,12 +100,16 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
     for i in options_count:
         count = options_count[i]
         # TODO: remove options from row, column and square
-        # if count == 1:
-        #     print(f"Element {i} is only possible in {count} cell")
-        #     loc_sq = find_element_index(input_list, i)
-        #     input_sudoku[(sq_idx[0] * 3) + loc_sq[0]][(sq_idx[1] * 3) + loc_sq[1]] = i
-        #     input_options[(sq_idx[0] * 3) + loc_sq[0]][(sq_idx[1] * 3) + loc_sq[1]] = []
-
+        if count == 1:
+            print(f"Element {i} is only possible in {count} cell")
+            loc_sq = find_element_index(input_list, i)
+            row_id = (sq_idx[0] * 3) + loc_sq[0]
+            col_id = (sq_idx[1] * 3) + loc_sq[1]
+            input_sudoku[row_id][col_id] = i
+            input_options[row_id][col_id] = []
+            prune_options_ele_added(input_options, row_id, i)
+            transposed_inputs = [[line[j] for line in input_options] for j in range(len(input_options[0]))]
+            prune_options_ele_added(transposed_inputs, col_id, i)
         if 2 <= count <= 3:
             row_coords, col_coords = [], []
             for row_index, inner_list in enumerate(opt_per_cell):
@@ -237,32 +241,32 @@ if __name__ == '__main__':
     in_sud = start
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
-    # plot_sudoku(out_sud, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt, f"out opt {iteration}")
+    plot_sudoku(out_sud, f"out_sud {iteration}")
+    plot_sudoku_options(out_opt, f"out opt {iteration}")
 
-    time.sleep(0.3)
-    iteration = 2
-    out_sud2, out_opt2 = check_items(out_sud, out_opt)
-    # plot_sudoku(out_sud2, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt2, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 3
-    out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
-    # plot_sudoku(out_sud3, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt3, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 4
-    out_sud4, out_opt4 = check_items(out_sud3, out_opt3)
-    plot_sudoku(out_sud4, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt4, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 5
-    out_sud5, out_opt5 = check_items(out_sud4, out_opt4)
-    plot_sudoku(out_sud5, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt5, f"out opt {iteration}")
+    # time.sleep(0.3)
+    # iteration = 2
+    # out_sud2, out_opt2 = check_items(out_sud, out_opt)
+    # # plot_sudoku(out_sud2, f"out_sud {iteration}")
+    # # plot_sudoku_options(out_opt2, f"out opt {iteration}")
+    #
+    # time.sleep(0.3)
+    # iteration = 3
+    # out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
+    # # plot_sudoku(out_sud3, f"out_sud {iteration}")
+    # # plot_sudoku_options(out_opt3, f"out opt {iteration}")
+    #
+    # time.sleep(0.3)
+    # iteration = 4
+    # out_sud4, out_opt4 = check_items(out_sud3, out_opt3)
+    # plot_sudoku(out_sud4, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt4, f"out opt {iteration}")
+    #
+    # time.sleep(0.3)
+    # iteration = 5
+    # out_sud5, out_opt5 = check_items(out_sud4, out_opt4)
+    # plot_sudoku(out_sud5, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt5, f"out opt {iteration}")
 
     # time.sleep(0.3)
     # iteration = 6
