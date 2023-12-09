@@ -152,11 +152,13 @@ def check_square_equals(input_list, sq_row_idx, sq_col_idx, input_options, sq_id
 
 def analyse_square_options(input_options, input_sudoku):
     for i in range(0, 9, 3):
+        sq_row_id = round(i/3)
         for j in range(0, 9, 3):
-            print("\nsquare", round(i/3), round(j/3))
+            sq_col_id = round(j/3)
+            print("\nsquare", sq_row_id, sq_col_id)
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
-            input_options, input_sudoku = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)], input_sudoku)
-            new_square = check_square_equals(square, i, j, input_options, [round(i/3), round(j/3)])
+            input_options, input_sudoku = check_square_options(square, i, j, input_options, [sq_row_id, sq_col_id], input_sudoku)
+            new_square = check_square_equals(square, i, j, input_options, [sq_row_id, sq_col_id])
             if square != new_square:
                 start_row, start_col = i, j
                 for y in range(3):
