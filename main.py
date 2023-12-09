@@ -130,7 +130,6 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
 
 def check_square_equals(input_list, sq_row_idx, sq_col_idx, input_options, sq_idx):
     # TODO: make this working for all lengths
-    # TODO: check if they are on the same row or column
     cell_list = [element for innerList in input_list for element in innerList]
     for a, b in itertools.combinations(cell_list, 2):
         if a == b and a and b:
