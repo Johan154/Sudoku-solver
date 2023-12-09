@@ -197,7 +197,7 @@ def prune_options_ele_added(input_options, row_idx, col_idx, ele):
 
 
 def check_options(input_sudoku, input_options):
-    print("\nIteration: ", iteration)
+    # print("\nIteration: ", iteration)
     input_options, input_sudoku = analyse_square_options(input_options, input_sudoku)
     row_idx = 0
     for row in input_options:
@@ -219,27 +219,27 @@ def check_options(input_sudoku, input_options):
 
 
 def check_items(input_sudoku, input_options):
-    if iteration == 1:
-        for row in input_sudoku:
-            row_idx = input_sudoku.index(row)
-            col_idx = 0
-            for item in row:
-                if item == 0:
-                    # Check row, column and square for each 0 value
-                    row_options = set(check_straight(row))
-                    col = [line[col_idx] for line in input_sudoku]
-                    col_options = set(check_straight(col))
-                    square_options = set(check_square(input_sudoku, row_idx, col_idx))
+    # if iteration == 1:
+    for row in input_sudoku:
+        row_idx = input_sudoku.index(row)
+        col_idx = 0
+        for item in row:
+            if item == 0:
+                # Check row, column and square for each 0 value
+                row_options = set(check_straight(row))
+                col = [line[col_idx] for line in input_sudoku]
+                col_options = set(check_straight(col))
+                square_options = set(check_square(input_sudoku, row_idx, col_idx))
 
-                    # Get the intersection of these 3 lists
-                    intersection_result = row_options.intersection(col_options, square_options)
-                    intersection_list = list(intersection_result)
+                # Get the intersection of these 3 lists
+                intersection_result = row_options.intersection(col_options, square_options)
+                intersection_list = list(intersection_result)
 
-                    # Update the options list
-                    input_options[row_idx][col_idx] = intersection_list
-                col_idx += 1
-    out_sudoku, input_options = check_options(input_sudoku, input_options)
-    return out_sudoku, input_options
+                # Update the options list
+                input_options[row_idx][col_idx] = intersection_list
+            col_idx += 1
+    # out_sudoku, input_options = check_options(input_sudoku, input_options)
+    return input_sudoku, input_options
 
 
 if __name__ == '__main__':
@@ -258,58 +258,7 @@ if __name__ == '__main__':
 
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
-    iteration = 1
-    start_sud = copy.deepcopy(start)
-    in_sud = start
-    in_opt = options
-    out_sud, out_opt = check_items(in_sud, in_opt)
-    # plot_sudoku(out_sud, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 2
-    out_sud2, out_opt2 = check_items(out_sud, out_opt)
-    # plot_sudoku(out_sud2, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt2, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 3
-    out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
-    # plot_sudoku(out_sud3, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt3, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 4
-    out_sud4, out_opt4 = check_items(out_sud3, out_opt3)
-    # plot_sudoku(out_sud4, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt4, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 5
-    out_sud5, out_opt5 = check_items(out_sud4, out_opt4)
-    # plot_sudoku(out_sud5, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt5, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 6
-    out_sud6, out_opt6 = check_items(out_sud5, out_opt5)
-    # plot_sudoku(out_sud6, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt6, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 7
-    out_sud7, out_opt7 = check_items(out_sud6, out_opt6)
-    # plot_sudoku(out_sud7, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt7, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 8
-    out_sud8, out_opt8 = check_items(out_sud7, out_opt7)
-    # plot_sudoku(out_sud8, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt8, f"out opt {iteration}")
-
-    time.sleep(0.3)
-    iteration = 9
-    out_sud9, out_opt9 = check_items(out_sud8, out_opt8)
-    plot_sudoku(out_sud9, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt9, f"out opt {iteration}")
+    out_sud, out_opt = check_items(start, options)
+    for iteration in range(9):
+        check_options(out_sud, out_opt)
+    plot_sudoku(out_sud, "Output")
