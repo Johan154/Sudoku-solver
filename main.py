@@ -128,18 +128,35 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
     return input_options, input_sudoku
 
 
-def check_square_equals(input_list):
+def check_square_equals(input_list, sq_row_idx, sq_col_idx, input_options, sq_idx):
     # TODO: make this working for all lengths
     # TODO: check if they are on the same row or column
     cell_list = [element for innerList in input_list for element in innerList]
     for a, b in itertools.combinations(cell_list, 2):
         if a == b and a and b:
             if len(a) == 2:
-                print("Matching inputs found", a, b)
                 indices = [i for i, x in enumerate(cell_list) if x == a]
+                print(f"Matching inputs found {a} with indices {indices}")
                 for j in range(len(cell_list)):
                     if cell_list[j] and j not in indices:
                         cell_list[j] = list(set(cell_list[j]).difference(a))
+                row_coords, col_coords = [], []
+                for row_index, inner_list in enumerate(cell_list):
+                    for col_index, element in enumerate(inner_list):
+                        if element in a:
+                            row_coords.append(row_index % 3)
+                            col_coords.append(math.floor(row_index / 3))
+                if all(element == row_coords[0] for element in row_coords):
+                    for i in a:
+                        row_idx = sq_col_idx + row_coords[0]
+                        transposed_inputs = [[row[p] for row in input_options] for p in range(len(input_options[0]))]
+                        # print(f"{i} all in the same column ({row_idx})")
+                        prune_options_same_dir(i, row_idx, transposed_inputs, sq_idx[0])
+                if all(element == col_coords[0] for element in col_coords):
+                    for i in a:
+                        row_idx = sq_row_idx + col_coords[0]
+                        # print(f"{i} all in the same row ({row_idx})")
+                        prune_options_same_dir(i, row_idx, input_options, sq_idx[1])
     input_list = [cell_list[i:i+3] for i in range(0, len(cell_list), 3)]
     return input_list
 
@@ -150,7 +167,7 @@ def analyse_square_options(input_options, input_sudoku):
             print("\nsquare", round(i/3), round(j/3))
             square = [row[j:j + 3] for row in input_options[i:i + 3]]
             input_options, input_sudoku = check_square_options(square, i, j, input_options, [round(i/3), round(j/3)], input_sudoku)
-            new_square = check_square_equals(square)
+            new_square = check_square_equals(square, i, j, input_options, [round(i/3), round(j/3)])
             if square != new_square:
                 start_row, start_col = i, j
                 for y in range(3):
@@ -277,5 +294,23 @@ if __name__ == '__main__':
     time.sleep(0.3)
     iteration = 6
     out_sud6, out_opt6 = check_items(out_sud5, out_opt5)
-    plot_sudoku(out_sud6, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt6, f"out opt {iteration}")
+    # plot_sudoku(out_sud6, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt6, f"out opt {iteration}")
+
+    time.sleep(0.3)
+    iteration = 7
+    out_sud7, out_opt7 = check_items(out_sud6, out_opt6)
+    # plot_sudoku(out_sud7, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt7, f"out opt {iteration}")
+
+    time.sleep(0.3)
+    iteration = 8
+    out_sud8, out_opt8 = check_items(out_sud7, out_opt7)
+    # plot_sudoku(out_sud8, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt8, f"out opt {iteration}")
+
+    time.sleep(0.3)
+    iteration = 9
+    out_sud9, out_opt9 = check_items(out_sud8, out_opt8)
+    plot_sudoku(out_sud9, f"out_sud {iteration}")
+    plot_sudoku_options(out_opt9, f"out opt {iteration}")
