@@ -83,7 +83,6 @@ def prune_options_same_dir(ele, prune_row, input_options, sq_idx):
         if ele in cell and cell_count not in skip_cells:
             cell.remove(ele)
         cell_count += 1
-    return 0
 
 
 def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_idx, input_sudoku):
@@ -227,6 +226,13 @@ def check_items(input_sudoku, input_options):
     return input_sudoku, input_options
 
 
+def check_empty_opts(output_options):
+    if not any(any(inner_list) for inner_list in output_options):
+        return False
+    else:
+        return True
+
+
 if __name__ == '__main__':
     # TODO: read directly from input file
     # Create initial sudoku
@@ -244,6 +250,9 @@ if __name__ == '__main__':
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
     out_sud, out_opt = check_items(start, options)
-    for iteration in range(9):
+
+    # Iterate while there are options left
+    while check_empty_opts(out_opt):
         check_options(out_sud, out_opt)
     plot_sudoku(out_sud, "Output")
+    plot_sudoku_options(out_opt, "Output")
