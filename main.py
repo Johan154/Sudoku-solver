@@ -99,17 +99,16 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
     options_count = Counter(options_list)
     for i in options_count:
         count = options_count[i]
-        # TODO: remove options from row, column and square
         if count == 1:
-            print(f"Element {i} is only possible in {count} cell")
             loc_sq = find_element_index(input_list, i)
             row_id = (sq_idx[0] * 3) + loc_sq[0]
             col_id = (sq_idx[1] * 3) + loc_sq[1]
+            print(f"Element {i} is only possible in {count} cell in row {row_id} and column {col_id}")
             input_sudoku[row_id][col_id] = i
             input_options[row_id][col_id] = []
-            prune_options_ele_added(input_options, row_id, i)
+            prune_options_ele_added(input_options, row_id, col_id, i)
             transposed_inputs = [[line[j] for line in input_options] for j in range(len(input_options[0]))]
-            prune_options_ele_added(transposed_inputs, col_id, i)
+            prune_options_ele_added(transposed_inputs, col_id, row_id, i)
         if 2 <= count <= 3:
             row_coords, col_coords = [], []
             for row_index, inner_list in enumerate(opt_per_cell):
@@ -131,6 +130,7 @@ def check_square_options(input_list, sq_row_idx, sq_col_idx, input_options, sq_i
 
 def check_square_equals(input_list):
     # TODO: make this working for all lengths
+    # TODO: check if they are on the same row or column
     cell_list = [element for innerList in input_list for element in innerList]
     for a, b in itertools.combinations(cell_list, 2):
         if a == b and a and b:
@@ -167,10 +167,17 @@ def find_element_index(list_of_lists, target_element):
     return None
 
 
-def prune_options_ele_added(input_options, row_idx, ele):
+def prune_options_ele_added(input_options, row_idx, col_idx, ele):
     for cell in input_options[row_idx]:
         if cell and ele in cell:
             cell.remove(ele)
+    i = math.floor(row_idx / 3) * 3
+    j = math.floor(col_idx / 3) * 3
+    square = [row[j:j + 3] for row in input_options[i:i + 3]]
+    for subrow in square:
+        for cell in subrow:
+            if cell and ele in cell:
+                cell.remove(ele)
 
 
 def check_options(input_sudoku, input_options):
@@ -184,13 +191,12 @@ def check_options(input_sudoku, input_options):
                 input_sudoku[row_idx][col_idx] = opt[0]
                 input_options[row_idx][col_idx] = []
                 # plot_sudoku(input_sudoku, f"inbetween version {iteration}")
-                # TODO: remove options from row, column and square
                 print(f"Updated sudoku with element {opt[0]} in row {row_idx} and column {col_idx}")
-                prune_options_ele_added(input_options, row_idx, opt[0])
+                prune_options_ele_added(input_options, row_idx, col_idx, opt[0])
                 # plot_sudoku_options(input_options, f"inbetween version {iteration}")
                 transposed_inputs = [[line[i] for line in input_options] for i in range(len(input_options[0]))]
                 # plot_sudoku_options(transposed_inputs, f"inbetween version {iteration}")
-                prune_options_ele_added(transposed_inputs, col_idx, opt[0])
+                prune_options_ele_added(transposed_inputs, col_idx, row_idx, opt[0])
             col_idx += 1
         row_idx += 1
     return input_sudoku, input_options
@@ -241,35 +247,35 @@ if __name__ == '__main__':
     in_sud = start
     in_opt = options
     out_sud, out_opt = check_items(in_sud, in_opt)
-    plot_sudoku(out_sud, f"out_sud {iteration}")
-    plot_sudoku_options(out_opt, f"out opt {iteration}")
+    # plot_sudoku(out_sud, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt, f"out opt {iteration}")
 
-    # time.sleep(0.3)
-    # iteration = 2
-    # out_sud2, out_opt2 = check_items(out_sud, out_opt)
-    # # plot_sudoku(out_sud2, f"out_sud {iteration}")
-    # # plot_sudoku_options(out_opt2, f"out opt {iteration}")
-    #
-    # time.sleep(0.3)
-    # iteration = 3
-    # out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
-    # # plot_sudoku(out_sud3, f"out_sud {iteration}")
-    # # plot_sudoku_options(out_opt3, f"out opt {iteration}")
-    #
-    # time.sleep(0.3)
-    # iteration = 4
-    # out_sud4, out_opt4 = check_items(out_sud3, out_opt3)
+    time.sleep(0.3)
+    iteration = 2
+    out_sud2, out_opt2 = check_items(out_sud, out_opt)
+    # plot_sudoku(out_sud2, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt2, f"out opt {iteration}")
+
+    time.sleep(0.3)
+    iteration = 3
+    out_sud3, out_opt3 = check_items(out_sud2, out_opt2)
+    # plot_sudoku(out_sud3, f"out_sud {iteration}")
+    # plot_sudoku_options(out_opt3, f"out opt {iteration}")
+
+    time.sleep(0.3)
+    iteration = 4
+    out_sud4, out_opt4 = check_items(out_sud3, out_opt3)
     # plot_sudoku(out_sud4, f"out_sud {iteration}")
     # plot_sudoku_options(out_opt4, f"out opt {iteration}")
-    #
-    # time.sleep(0.3)
-    # iteration = 5
-    # out_sud5, out_opt5 = check_items(out_sud4, out_opt4)
+
+    time.sleep(0.3)
+    iteration = 5
+    out_sud5, out_opt5 = check_items(out_sud4, out_opt4)
     # plot_sudoku(out_sud5, f"out_sud {iteration}")
     # plot_sudoku_options(out_opt5, f"out opt {iteration}")
 
-    # time.sleep(0.3)
-    # iteration = 6
-    # out_sud6, out_opt6 = check_items(out_sud5, out_opt5)
-    # plot_sudoku(out_sud6, f"out_sud {iteration}")
-    # plot_sudoku_options(out_opt6, f"out opt {iteration}")
+    time.sleep(0.3)
+    iteration = 6
+    out_sud6, out_opt6 = check_items(out_sud5, out_opt5)
+    plot_sudoku(out_sud6, f"out_sud {iteration}")
+    plot_sudoku_options(out_opt6, f"out opt {iteration}")
