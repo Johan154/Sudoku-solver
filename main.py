@@ -1,9 +1,11 @@
 import itertools
 import math
 import numpy as np
+import cv2
 
 from matplotlib import pyplot as plt
 from collections import Counter
+from ultralytics import YOLO
 
 
 def plot_sudoku(sudoku, title):
@@ -235,19 +237,42 @@ def check_empty_opts(output_options):
         return True
 
 
+def run_inference():
+    model = YOLO(path_model)
+    results = model.predict(source=path_test_data, device=0, save=False, show_conf=False)
+    return results
+
+
+def extract_results(inf_results):
+    image = cv2.imread(path_test_data)
+    height, width = image.shape[:2]
+    print(f"Height is {height} pixels and width is {width} pixels")
+    print(f"Each box has a height of {round(height / 9 ,2)} pixels and a width of {round(width / 9 ,2)}")
+    start_empty = [[0 for j in range(9)] for i in range(9)]
+
+    results = inf_results
+    boxes = results[0].boxes.xyxy.tolist()
+    classes = results[0].boxes.cls.tolist()
+    names = results[0].names
+    confidences = results[0].boxes.conf.tolist()
+
+    for box, cls, conf in zip(boxes, classes, confidences):
+        x1, y1, x2, y2 = box
+        center_x = x1 + 0.5 * (x2 - x1)
+        center_y = y1 + 0.5 * (y2 - y1)
+        name = names[int(cls)]
+        row_idx = int(center_y // (height / 9))
+        col_idx = int(center_x // (width / 9))
+        start_empty[row_idx][col_idx] = int(name)
+    return start_empty
+
+
 if __name__ == '__main__':
-    # TODO: read directly from input file
-    # Create initial sudoku
-    start = \
-        [[0, 6, 0, 0, 0, 0, 0, 9, 1],
-         [0, 2, 8, 7, 0, 0, 0, 0, 3],
-         [1, 0, 0, 4, 0, 0, 8, 0, 0],
-         [0, 0, 0, 5, 0, 0, 0, 0, 2],
-         [5, 0, 0, 2, 0, 0, 0, 0, 4],
-         [0, 3, 0, 0, 0, 6, 0, 0, 7],
-         [0, 7, 0, 0, 0, 0, 0, 0, 0],
-         [0, 1, 0, 0, 8, 0, 6, 0, 0],
-         [3, 0, 4, 0, 2, 0, 0, 0, 0]]
+    # Extract start sudoku from image
+    path_test_data = ("D://OneDrive - Wageningen University & Research//Documenten//Sudoku_project//Test_dataset//sudoku_1.png")
+    path_model = "C://Users//johan//PycharmProjects//JustForFun//runs//detect//train//weights//best.pt"
+    inference_results = run_inference()
+    start = extract_results(inference_results)
 
     # Create initial options list
     options = [[[] for j in range(9)] for i in range(9)]
@@ -256,5 +281,5 @@ if __name__ == '__main__':
     # Iterate while there are options left
     while check_empty_opts(out_opt):
         check_options(out_sud, out_opt)
-    plot_sudoku(out_sud, "Output")
-    plot_sudoku_options(out_opt, "Output")
+    plot_sudoku(out_sud, "Output sudoku")
+    plot_sudoku_options(out_opt, "Output options")
